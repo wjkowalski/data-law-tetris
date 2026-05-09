@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Data Law Tetris</title>
+  <style>
+    body { font-family: Arial; text-align: center; }
+#gamePanel {
+  height: 80vh;
+  width: 90vw;
+  margin: 0 auto;
+  border: 3px solid #222;
+  position: relative;
+  overflow: hidden;
+  background: #f5f7fa;
+}
+
+#fallingItem {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  padding: 16px;
+  background: #9dd7ff;
+  border: 2px solid #1b4f72;
+  border-radius: 8px;
+  text-align: center;
+  z-index: 2;
+}
+
+#bins {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.bin {
+  height: 90px;
+  border: 2px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  background: #ffffff;
+}
+
+#fallingItem.dropping::before,
+#fallingItem.dropping::after {
+  content: "";
+  position: absolute;
+  top: -45px;
+  width: 6px;
+  height: 35px;
+  background: #1b4f72;
+  border-radius: 999px;
+  opacity: 0.7;
+}
+
+#fallingItem.dropping::before {
+  left: 45px;
+  transform: rotate(-12deg);
+}
+
+#fallingItem.dropping::after {
+  right: 45px;
+  transform: rotate(12deg);
+}
+
+#fallingItem.dropping {
+  box-shadow: 0 -18px 0 -10px rgba(27, 79, 114, 0.45),
+              0 -34px 0 -18px rgba(27, 79, 114, 0.25);
+}
+
+#resultOverlay {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  font-size: 64px;
+  font-weight: 900;
+  text-align: center;
+  background: white;
+  border: 4px solid #222;
+  border-radius: 20px;
+  padding: 24px 36px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+#resultOverlay.hidden {
+  display: none;
+}
+
+#resultIcon svg {
+  width: 120px;
+  height: 120px;
+  margin-top: 12px;
+}
+
+.correct {
+  color: #138a36;
+}
+
+.incorrect {
+  color: #c1121f;
+}
+  </style>
+</head>
+<body>
+
+<h1>Data Law Tetris</h1>
+<p>Use ← → keys, press SPACE to drop</p>
+<p>Score: <span id="score">0</span></p>
+<p id="feedback"></p>
+
+<div id="gamePanel">
+  <div id="fallingItem">Scenario text here</div>
+
+   <div id="resultOverlay" class="hidden">
+    <div>
+      <div id="resultText"></div>
+      <div id="resultIcon"></div>
+    </div>
+  </div>
+
+  <div id="bins">
+    <div class="bin">PIPEDA</div>
+    <div class="bin">FOIPOP</div>
+    <div class="bin">PHIA</div>
+    <div class="bin">PIIDPA</div>
+  </div>
+</div>
+
+<script>
+    const laws = ["PIPEDA", "FOIPOP", "PHIA", "PIIDPA"];
+
+const scenarios = [
+  { text: "A Halifax online store collects customer emails for marketing.", law: "PIPEDA" },
+  { text: "A private landscaping company stores client addresses and payment history.", law: "PIPEDA" },
+  { text: "A subscription meal-kit company tracks customer food preferences.", law: "PIPEDA" },
+  { text: "A private gym collects member health goals and payment information.", law: "PIPEDA" },
+  { text: "A private tutoring company emails promotional offers to former clients.", law: "PIPEDA" },
+  { text: "A local retailer uses purchase history to recommend products.", law: "PIPEDA" },
+  { text: "A private insurance broker collects customer income and family details.", law: "PIPEDA" },
+  { text: "A car dealership collects customer financing information.", law: "PIPEDA" },
+  { text: "A private app developer sells user behaviour analytics to advertisers.", law: "PIPEDA" },
+  { text: "A private hotel stores guest names, addresses, and credit card details.", law: "PIPEDA" },
+  { text: "A private marketing firm builds customer profiles from survey responses.", law: "PIPEDA" },
+  { text: "A private security company stores client camera access logs.", law: "PIPEDA" },
+  { text: "A private daycare collects parent contact information for billing.", law: "PIPEDA" },
+  { text: "A private tax preparation business stores client tax documents.", law: "PIPEDA" },
+  { text: "A private fitness app tracks sleep, workouts, and location data.", law: "PIPEDA" },
+  { text: "An e-commerce site sends abandoned-cart emails to customers.", law: "PIPEDA" },
+  { text: "A private recruiter stores applicant resumes and interview notes.", law: "PIPEDA" },
+  { text: "A private software company logs customer support chats.", law: "PIPEDA" },
+  { text: "A bank analyzes customer spending patterns for fraud detection.", law: "PIPEDA" },
+  { text: "A private delivery company tracks customer addresses and delivery notes.", law: "PIPEDA" },
+  { text: "A private landlord collects rental applications and references.", law: "PIPEDA" },
+  { text: "A private travel agency stores passport numbers for bookings.", law: "PIPEDA" },
+  { text: "A loyalty rewards program tracks customer purchases.", law: "PIPEDA" },
+  { text: "A private online learning company stores student progress data.", law: "PIPEDA" },
+  { text: "A private restaurant reservation platform stores diner preferences.", law: "PIPEDA" },
+
+  { text: "NSCC stores student records and shares data with a provincial department.", law: "FOIPOP" },
+  { text: "A Nova Scotia government office stores applications for housing support.", law: "FOIPOP" },
+  { text: "A public school board stores student attendance records.", law: "FOIPOP" },
+  { text: "A provincial department keeps employee performance files.", law: "FOIPOP" },
+  { text: "A municipality stores property tax records.", law: "FOIPOP" },
+  { text: "A public library stores patron borrowing records.", law: "FOIPOP" },
+  { text: "A Nova Scotia agency collects citizen feedback forms.", law: "FOIPOP" },
+  { text: "A government department stores records about permit applications.", law: "FOIPOP" },
+  { text: "A provincial regulator keeps complaint records about licensed workers.", law: "FOIPOP" },
+  { text: "A public college stores accommodation request documents.", law: "FOIPOP" },
+  { text: "A municipality keeps records of bylaw complaints.", law: "FOIPOP" },
+  { text: "A provincial department tracks participation in a public grant program.", law: "FOIPOP" },
+  { text: "A public university stores student discipline records.", law: "FOIPOP" },
+  { text: "A school board stores parent contact information.", law: "FOIPOP" },
+  { text: "A government office collects personal details for a licence renewal.", law: "FOIPOP" },
+  { text: "A provincial museum stores donor contact information.", law: "FOIPOP" },
+  { text: "A public transit authority stores customer complaint records.", law: "FOIPOP" },
+  { text: "A municipal recreation department stores program registration forms.", law: "FOIPOP" },
+  { text: "A provincial department stores records about social assistance applications.", law: "FOIPOP" },
+  { text: "A public college stores academic appeal records.", law: "FOIPOP" },
+  { text: "A government agency maintains inspection records tied to individuals.", law: "FOIPOP" },
+  { text: "A town office stores voter contact records for municipal services.", law: "FOIPOP" },
+  { text: "A public body receives an access-to-information request.", law: "FOIPOP" },
+  { text: "A provincial department stores internal HR complaint files.", law: "FOIPOP" },
+  { text: "A public institution stores employee payroll information.", law: "FOIPOP" },
+
+  { text: "A hospital shares patient records with a specialist.", law: "PHIA" },
+  { text: "A family doctor stores patient diagnosis notes.", law: "PHIA" },
+  { text: "A clinic sends lab results to another healthcare provider.", law: "PHIA" },
+  { text: "A pharmacy stores prescription history.", law: "PHIA" },
+  { text: "A dentist stores patient treatment records.", law: "PHIA" },
+  { text: "A physiotherapy clinic records injury and treatment details.", law: "PHIA" },
+  { text: "A mental health clinic stores counselling notes.", law: "PHIA" },
+  { text: "A hospital employee accesses patient records without a care reason.", law: "PHIA" },
+  { text: "A medical lab stores blood test results.", law: "PHIA" },
+  { text: "A walk-in clinic collects health card numbers and symptoms.", law: "PHIA" },
+  { text: "A long-term care home stores resident care plans.", law: "PHIA" },
+  { text: "A paramedic service records patient treatment information.", law: "PHIA" },
+  { text: "A nurse practitioner clinic stores medication history.", law: "PHIA" },
+  { text: "A hospital sends discharge summaries to a family doctor.", law: "PHIA" },
+  { text: "A public health unit tracks vaccination records.", law: "PHIA" },
+  { text: "A medical imaging clinic stores X-ray reports.", law: "PHIA" },
+  { text: "A specialist clinic receives a referral containing patient history.", law: "PHIA" },
+  { text: "A hospice stores patient care preferences.", law: "PHIA" },
+  { text: "A hospital reviews patient charts for quality improvement.", law: "PHIA" },
+  { text: "A rehabilitation clinic stores mobility assessment results.", law: "PHIA" },
+  { text: "A home-care provider records patient visit notes.", law: "PHIA" },
+  { text: "A surgeon stores pre-operative assessment information.", law: "PHIA" },
+  { text: "A dietitian working in a clinic stores patient nutrition plans.", law: "PHIA" },
+  { text: "A hospital stores emergency department triage records.", law: "PHIA" },
+  { text: "A healthcare custodian reports a lost patient file.", law: "PHIA" },
+
+  { text: "A Nova Scotia government office stores citizen data on a US cloud server.", law: "PIIDPA" },
+  { text: "A municipality uses a US-based contractor to process permit applications.", law: "PIIDPA" },
+  { text: "A public body stores employee files on servers located outside Canada.", law: "PIIDPA" },
+  { text: "A provincial department allows foreign technical support to access citizen records.", law: "PIIDPA" },
+  { text: "A school board uses an online platform that stores student data in the United States.", law: "PIIDPA" },
+  { text: "A public college uses a cloud service where student data may be accessed outside Canada.", law: "PIIDPA" },
+  { text: "A government agency sends personal information to a vendor in another country.", law: "PIIDPA" },
+  { text: "A municipality backs up citizen records to servers outside Canada.", law: "PIIDPA" },
+  { text: "A public institution gives a foreign help desk access to personal information.", law: "PIIDPA" },
+  { text: "A provincial department stores public program applications in a non-Canadian data centre.", law: "PIIDPA" },
+  { text: "A public library uses a US-hosted system for patron accounts.", law: "PIIDPA" },
+  { text: "A government office contracts a foreign company to analyze citizen survey data.", law: "PIIDPA" },
+  { text: "A public university stores student advising notes in an international SaaS platform.", law: "PIIDPA" },
+  { text: "A provincial agency permits remote database support from outside Canada.", law: "PIIDPA" },
+  { text: "A municipality uploads resident contact lists to a US email marketing service.", law: "PIIDPA" },
+  { text: "A public school system uses foreign-hosted software for student assessments.", law: "PIIDPA" },
+  { text: "A Nova Scotia public body stores HR files in an overseas cloud system.", law: "PIIDPA" },
+  { text: "A provincial department uses a foreign transcription service for citizen interviews.", law: "PIIDPA" },
+  { text: "A public institution transfers personal data to a vendor outside Canada for processing.", law: "PIIDPA" },
+  { text: "A town office gives non-Canadian support staff access to resident records.", law: "PIIDPA" },
+  { text: "A government body stores grant application data in a US-hosted database.", law: "PIIDPA" },
+  { text: "A public agency uses an international analytics tool on identifiable citizen data.", law: "PIIDPA" },
+  { text: "A public college uses a non-Canadian cloud vendor for student service records.", law: "PIIDPA" },
+  { text: "A school board stores parent contact records in a foreign-hosted platform.", law: "PIIDPA" },
+  { text: "A provincial office sends citizen records to an overseas call centre.", law: "PIIDPA" }
+];
+
+let currentScenario = null;
+let currentColumn = 1;
+let score = 0;
+let scenarioIndex = 0;
+
+let scenarioDeck = [];
+
+function shuffleScenarios() {
+  scenarioDeck = [...scenarios];
+
+  for (let i = scenarioDeck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [scenarioDeck[i], scenarioDeck[j]] = [scenarioDeck[j], scenarioDeck[i]];
+  }
+}
+
+const gamePanel = document.getElementById("gamePanel");
+const fallingItem = document.getElementById("fallingItem");
+const scoreDisplay = document.getElementById("score");
+const feedbackDisplay = document.getElementById("feedback");
+
+function startGame() {
+  score = 0;
+  currentColumn = 1;
+
+  shuffleScenarios();
+  updateScore();
+  loadScenario();
+}
+
+function updateItemPosition() {
+  const columnWidth = gamePanel.clientWidth / laws.length;
+  const x = currentColumn * columnWidth + columnWidth / 2;
+
+  fallingItem.style.left = `${x}px`;
+}
+
+function moveItem(direction) {
+  currentColumn += direction;
+
+  if (currentColumn < 0) currentColumn = 0;
+  if (currentColumn >= laws.length) currentColumn = laws.length - 1;
+
+  updateItemPosition();
+}
+
+function loadScenario() {
+  if (scenarioDeck.length === 0) {
+    fallingItem.textContent = "Game over!";
+    fallingItem.style.top = "20px";
+    fallingItem.style.opacity = "1";
+    feedbackDisplay.textContent = `Final score: ${score}`;
+    return;
+  }
+
+  currentScenario = scenarioDeck.pop();
+  currentColumn = 1;
+
+  fallingItem.style.transition = "none";
+  fallingItem.style.top = "20px";
+  fallingItem.style.opacity = "1";
+  fallingItem.textContent = currentScenario.text;
+
+  updateItemPosition();
+  feedbackDisplay.textContent = "";
+}
+
+function dropItem() {
+  if (!currentScenario) return;
+
+  const scenarioBeingDropped = currentScenario;
+  const selectedLaw = laws[currentColumn];
+
+  currentScenario = null;
+
+  const panelHeight = gamePanel.clientHeight;
+  const itemHeight = fallingItem.offsetHeight;
+  const binHeight = 90;
+
+  const dropY = panelHeight - binHeight - itemHeight + 10;
+
+  fallingItem.classList.add("dropping");
+
+  fallingItem.style.transition = "top 0.45s ease-in";
+  fallingItem.style.top = `${dropY}px`;
+
+    setTimeout(() => {
+  fallingItem.classList.remove("dropping");
+
+  const isCorrect = selectedLaw === scenarioBeingDropped.law;
+
+  if (isCorrect) {
+    score += 5;
+    feedbackDisplay.textContent = `Correct: ${selectedLaw}`;
+  } else {
+    score -= 5;
+    feedbackDisplay.textContent = `Incorrect. Correct answer: ${scenarioBeingDropped.law}`;
+  }
+
+  showResult(isCorrect);
+  updateScore();
+
+  fallingItem.style.opacity = "0";
+
+  setTimeout(() => {
+    loadScenario();
+  }, 250);
+
+}, 500);
+}
+
+
+function updateScore() {
+  scoreDisplay.textContent = score;
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.code === "ArrowLeft") {
+    moveItem(-1);
+  }
+
+  if (event.code === "ArrowRight") {
+    moveItem(1);
+  }
+
+  if (event.code === "Space" || event.code === "Enter") {
+    event.preventDefault();
+    dropItem();
+  }
+});
+
+window.addEventListener("resize", updateItemPosition);
+
+
+const resultOverlay = document.getElementById("resultOverlay");
+const resultText = document.getElementById("resultText");
+const resultIcon = document.getElementById("resultIcon");
+
+const correctSVG = `
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="52" fill="#b7f7c2" stroke="#138a36" stroke-width="6"/>
+  <circle cx="42" cy="43" r="5" fill="#138a36"/>
+  <circle cx="78" cy="43" r="5" fill="#138a36"/>
+  <path d="M43 70 Q60 88 77 70" fill="none" stroke="#138a36" stroke-width="5" stroke-linecap="round"/>
+</svg>
+`;
+
+const incorrectSVG = `
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="52" fill="#ffd1d1" stroke="#c1121f" stroke-width="6"/>
+   <circle cx="42" cy="45" r="5" fill="#c1121f"/>
+  <circle cx="78" cy="45" r="5" fill="#c1121f"/>
+  <path d="M42 82 Q60 66 78 82" fill="none" stroke="#c1121f" stroke-width="5" stroke-linecap="round"/>
+</svg>
+`;
+
+function showResult(isCorrect) {
+  resultOverlay.classList.remove("hidden", "correct", "incorrect");
+
+  if (isCorrect) {
+    resultOverlay.classList.add("correct");
+    resultText.textContent = "CORRECT!";
+    resultIcon.innerHTML = correctSVG;
+  } else {
+    resultOverlay.classList.add("incorrect");
+    resultText.textContent = "INCORRECT!";
+    resultIcon.innerHTML = incorrectSVG;
+  }
+
+  setTimeout(() => {
+    resultOverlay.classList.add("hidden");
+    resultIcon.innerHTML = "";
+  }, 800);
+}
+
+startGame();
+
+</script>
+
+</body>
+</html>
