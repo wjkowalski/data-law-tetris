@@ -47,28 +47,6 @@
   background: #ffffff;
 }
 
-#fallingItem.dropping::before,
-#fallingItem.dropping::after {
-  content: "";
-  position: absolute;
-  top: -45px;
-  width: 6px;
-  height: 35px;
-  background: #1b4f72;
-  border-radius: 999px;
-  opacity: 0.7;
-}
-
-#fallingItem.dropping::before {
-  left: 45px;
-  transform: rotate(-12deg);
-}
-
-#fallingItem.dropping::after {
-  right: 45px;
-  transform: rotate(12deg);
-}
-
 #fallingItem.dropping {
   box-shadow: 0 -18px 0 -10px rgba(27, 79, 114, 0.45),
               0 -34px 0 -18px rgba(27, 79, 114, 0.25);
@@ -107,6 +85,11 @@
 .incorrect {
   color: #c1121f;
 }
+
+#incorrectFeedback{
+  font-size: 1.5rem
+}
+
   </style>
 </head>
 <body>
@@ -123,6 +106,7 @@
     <div>
       <div id="resultText"></div>
       <div id="resultIcon"></div>
+      <div id="incorrectFeedback"></div>
     </div>
   </div>
 
@@ -138,109 +122,109 @@
     const laws = ["PIPEDA", "FOIPOP", "PHIA", "PIIDPA"];
 
 const scenarios = [
-  { text: "A Halifax online store collects customer emails for marketing.", law: "PIPEDA" },
-  { text: "A private landscaping company stores client addresses and payment history.", law: "PIPEDA" },
-  { text: "A subscription meal-kit company tracks customer food preferences.", law: "PIPEDA" },
-  { text: "A private gym collects member health goals and payment information.", law: "PIPEDA" },
-  { text: "A private tutoring company emails promotional offers to former clients.", law: "PIPEDA" },
-  { text: "A local retailer uses purchase history to recommend products.", law: "PIPEDA" },
-  { text: "A private insurance broker collects customer income and family details.", law: "PIPEDA" },
-  { text: "A car dealership collects customer financing information.", law: "PIPEDA" },
-  { text: "A private app developer sells user behaviour analytics to advertisers.", law: "PIPEDA" },
-  { text: "A private hotel stores guest names, addresses, and credit card details.", law: "PIPEDA" },
-  { text: "A private marketing firm builds customer profiles from survey responses.", law: "PIPEDA" },
-  { text: "A private security company stores client camera access logs.", law: "PIPEDA" },
-  { text: "A private daycare collects parent contact information for billing.", law: "PIPEDA" },
-  { text: "A private tax preparation business stores client tax documents.", law: "PIPEDA" },
-  { text: "A private fitness app tracks sleep, workouts, and location data.", law: "PIPEDA" },
-  { text: "An e-commerce site sends abandoned-cart emails to customers.", law: "PIPEDA" },
-  { text: "A private recruiter stores applicant resumes and interview notes.", law: "PIPEDA" },
-  { text: "A private software company logs customer support chats.", law: "PIPEDA" },
-  { text: "A bank analyzes customer spending patterns for fraud detection.", law: "PIPEDA" },
-  { text: "A private delivery company tracks customer addresses and delivery notes.", law: "PIPEDA" },
-  { text: "A private landlord collects rental applications and references.", law: "PIPEDA" },
-  { text: "A private travel agency stores passport numbers for bookings.", law: "PIPEDA" },
-  { text: "A loyalty rewards program tracks customer purchases.", law: "PIPEDA" },
-  { text: "A private online learning company stores student progress data.", law: "PIPEDA" },
-  { text: "A private restaurant reservation platform stores diner preferences.", law: "PIPEDA" },
+  { text: "A Halifax online store collects customer emails for marketing.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private-sector organizations that collect personal information for commercial purposes." },
+  { text: "A private landscaping company stores client addresses and payment history.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies because this is a private business handling client personal information." },
+  { text: "A subscription meal-kit company tracks customer food preferences.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private companies using customer information in commercial activity." },
+  { text: "A private gym collects member health goals and payment information.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private-sector collection of member information for business purposes." },
+  { text: "A private tutoring company emails promotional offers to former clients.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to commercial organizations using client contact information for marketing." },
+  { text: "A local retailer uses purchase history to recommend products.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies when a private retailer uses customer purchase data commercially." },
+  { text: "A private insurance broker collects customer income and family details.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private businesses collecting personal details from customers." },
+  { text: "A car dealership collects customer financing information.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies because the dealership is a private business collecting customer financial information." },
+  { text: "A private app developer sells user behaviour analytics to advertisers.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private-sector use and disclosure of identifiable user data for commercial gain." },
+  { text: "A private hotel stores guest names, addresses, and credit card details.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to hotels handling guest personal information in commercial operations." },
+  { text: "A private marketing firm builds customer profiles from survey responses.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private firms creating profiles from personal information." },
+  { text: "A private security company stores client camera access logs.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies because a private company is managing client information commercially." },
+  { text: "A private daycare collects parent contact information for billing.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private organizations collecting contact information for business services." },
+  { text: "A private tax preparation business stores client tax documents.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private businesses storing client financial and tax information." },
+  { text: "A private fitness app tracks sleep, workouts, and location data.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private apps collecting personal information from users." },
+  { text: "An e-commerce site sends abandoned-cart emails to customers.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to online businesses using customer information for commercial follow-up." },
+  { text: "A private recruiter stores applicant resumes and interview notes.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private recruiters handling applicants’ personal information." },
+  { text: "A private software company logs customer support chats.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies because the company is collecting customer information during commercial service." },
+  { text: "A bank analyzes customer spending patterns for fraud detection.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to federally regulated private-sector organizations such as banks handling customer data." },
+  { text: "A private delivery company tracks customer addresses and delivery notes.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private delivery businesses collecting customer information for services." },
+  { text: "A private landlord collects rental applications and references.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies when private landlords collect personal information in a commercial rental context." },
+  { text: "A private travel agency stores passport numbers for bookings.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private agencies collecting travel and identity information from clients." },
+  { text: "A loyalty rewards program tracks customer purchases.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to commercial programs that collect and use customer purchase information." },
+  { text: "A private online learning company stores student progress data.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies because this is a private company storing learner information commercially." },
+  { text: "A private restaurant reservation platform stores diner preferences.", law: "PIPEDA", incorrectFeedback: "PIPEDA applies to private platforms collecting customer preference information." },
 
-  { text: "NSCC stores student records and shares data with a provincial department.", law: "FOIPOP" },
-  { text: "A Nova Scotia government office stores applications for housing support.", law: "FOIPOP" },
-  { text: "A public school board stores student attendance records.", law: "FOIPOP" },
-  { text: "A provincial department keeps employee performance files.", law: "FOIPOP" },
-  { text: "A municipality stores property tax records.", law: "FOIPOP" },
-  { text: "A public library stores patron borrowing records.", law: "FOIPOP" },
-  { text: "A Nova Scotia agency collects citizen feedback forms.", law: "FOIPOP" },
-  { text: "A government department stores records about permit applications.", law: "FOIPOP" },
-  { text: "A provincial regulator keeps complaint records about licensed workers.", law: "FOIPOP" },
-  { text: "A public college stores accommodation request documents.", law: "FOIPOP" },
-  { text: "A municipality keeps records of bylaw complaints.", law: "FOIPOP" },
-  { text: "A provincial department tracks participation in a public grant program.", law: "FOIPOP" },
-  { text: "A public university stores student discipline records.", law: "FOIPOP" },
-  { text: "A school board stores parent contact information.", law: "FOIPOP" },
-  { text: "A government office collects personal details for a licence renewal.", law: "FOIPOP" },
-  { text: "A provincial museum stores donor contact information.", law: "FOIPOP" },
-  { text: "A public transit authority stores customer complaint records.", law: "FOIPOP" },
-  { text: "A municipal recreation department stores program registration forms.", law: "FOIPOP" },
-  { text: "A provincial department stores records about social assistance applications.", law: "FOIPOP" },
-  { text: "A public college stores academic appeal records.", law: "FOIPOP" },
-  { text: "A government agency maintains inspection records tied to individuals.", law: "FOIPOP" },
-  { text: "A town office stores voter contact records for municipal services.", law: "FOIPOP" },
-  { text: "A public body receives an access-to-information request.", law: "FOIPOP" },
-  { text: "A provincial department stores internal HR complaint files.", law: "FOIPOP" },
-  { text: "A public institution stores employee payroll information.", law: "FOIPOP" },
+  { text: "NSCC stores student records and shares data with a provincial department.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to Nova Scotia public bodies and public institutions handling records." },
+  { text: "A Nova Scotia government office stores applications for housing support.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies because a provincial public body is collecting program information." },
+  { text: "A public school board stores student attendance records.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to Nova Scotia public bodies such as school boards." },
+  { text: "A provincial department keeps employee performance files.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to records held by provincial government departments." },
+  { text: "A municipality stores property tax records.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to municipal public bodies and their records." },
+  { text: "A public library stores patron borrowing records.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies because a public body is storing patron records." },
+  { text: "A Nova Scotia agency collects citizen feedback forms.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to Nova Scotia public agencies collecting citizen information." },
+  { text: "A government department stores records about permit applications.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to personal information held by government departments." },
+  { text: "A provincial regulator keeps complaint records about licensed workers.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies because a provincial public body holds complaint records." },
+  { text: "A public college stores accommodation request documents.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to public colleges and their student records." },
+  { text: "A municipality keeps records of bylaw complaints.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to municipal records, including bylaw complaint files." },
+  { text: "A provincial department tracks participation in a public grant program.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to provincial departments administering public programs." },
+  { text: "A public university stores student discipline records.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to records held by public institutions." },
+  { text: "A school board stores parent contact information.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies because the record is held by a public school board." },
+  { text: "A government office collects personal details for a licence renewal.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to personal information collected by government offices." },
+  { text: "A provincial museum stores donor contact information.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to records held by Nova Scotia public bodies and institutions." },
+  { text: "A public transit authority stores customer complaint records.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to public authority records about identifiable individuals." },
+  { text: "A municipal recreation department stores program registration forms.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to municipal departments collecting registration information." },
+  { text: "A provincial department stores records about social assistance applications.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to provincial public bodies administering social programs." },
+  { text: "A public college stores academic appeal records.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to public college records about students." },
+  { text: "A government agency maintains inspection records tied to individuals.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to personal information in records held by government agencies." },
+  { text: "A town office stores voter contact records for municipal services.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to municipal public body records." },
+  { text: "A public body receives an access-to-information request.", law: "FOIPOP", incorrectFeedback: "FOIPOP governs access-to-information requests made to Nova Scotia public bodies." },
+  { text: "A provincial department stores internal HR complaint files.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to records held by provincial departments, including HR files." },
+  { text: "A public institution stores employee payroll information.", law: "FOIPOP", incorrectFeedback: "FOIPOP applies to employee records held by public institutions." },
 
-  { text: "A hospital shares patient records with a specialist.", law: "PHIA" },
-  { text: "A family doctor stores patient diagnosis notes.", law: "PHIA" },
-  { text: "A clinic sends lab results to another healthcare provider.", law: "PHIA" },
-  { text: "A pharmacy stores prescription history.", law: "PHIA" },
-  { text: "A dentist stores patient treatment records.", law: "PHIA" },
-  { text: "A physiotherapy clinic records injury and treatment details.", law: "PHIA" },
-  { text: "A mental health clinic stores counselling notes.", law: "PHIA" },
-  { text: "A hospital employee accesses patient records without a care reason.", law: "PHIA" },
-  { text: "A medical lab stores blood test results.", law: "PHIA" },
-  { text: "A walk-in clinic collects health card numbers and symptoms.", law: "PHIA" },
-  { text: "A long-term care home stores resident care plans.", law: "PHIA" },
-  { text: "A paramedic service records patient treatment information.", law: "PHIA" },
-  { text: "A nurse practitioner clinic stores medication history.", law: "PHIA" },
-  { text: "A hospital sends discharge summaries to a family doctor.", law: "PHIA" },
-  { text: "A public health unit tracks vaccination records.", law: "PHIA" },
-  { text: "A medical imaging clinic stores X-ray reports.", law: "PHIA" },
-  { text: "A specialist clinic receives a referral containing patient history.", law: "PHIA" },
-  { text: "A hospice stores patient care preferences.", law: "PHIA" },
-  { text: "A hospital reviews patient charts for quality improvement.", law: "PHIA" },
-  { text: "A rehabilitation clinic stores mobility assessment results.", law: "PHIA" },
-  { text: "A home-care provider records patient visit notes.", law: "PHIA" },
-  { text: "A surgeon stores pre-operative assessment information.", law: "PHIA" },
-  { text: "A dietitian working in a clinic stores patient nutrition plans.", law: "PHIA" },
-  { text: "A hospital stores emergency department triage records.", law: "PHIA" },
-  { text: "A healthcare custodian reports a lost patient file.", law: "PHIA" },
+  { text: "A hospital shares patient records with a specialist.", law: "PHIA", incorrectFeedback: "PHIA applies to personal health information handled by health custodians." },
+  { text: "A family doctor stores patient diagnosis notes.", law: "PHIA", incorrectFeedback: "PHIA applies to patient health records held by healthcare providers." },
+  { text: "A clinic sends lab results to another healthcare provider.", law: "PHIA", incorrectFeedback: "PHIA applies to sharing personal health information between healthcare providers." },
+  { text: "A pharmacy stores prescription history.", law: "PHIA", incorrectFeedback: "PHIA applies to prescription information held by health custodians such as pharmacies." },
+  { text: "A dentist stores patient treatment records.", law: "PHIA", incorrectFeedback: "PHIA applies to dental treatment records because they are personal health information." },
+  { text: "A physiotherapy clinic records injury and treatment details.", law: "PHIA", incorrectFeedback: "PHIA applies to health treatment details recorded by healthcare providers." },
+  { text: "A mental health clinic stores counselling notes.", law: "PHIA", incorrectFeedback: "PHIA applies to counselling notes because they are personal health information." },
+  { text: "A hospital employee accesses patient records without a care reason.", law: "PHIA", incorrectFeedback: "PHIA applies to unauthorized access to patient health information." },
+  { text: "A medical lab stores blood test results.", law: "PHIA", incorrectFeedback: "PHIA applies to lab results because they are personal health information." },
+  { text: "A walk-in clinic collects health card numbers and symptoms.", law: "PHIA", incorrectFeedback: "PHIA applies to health card numbers and symptoms collected for care." },
+  { text: "A long-term care home stores resident care plans.", law: "PHIA", incorrectFeedback: "PHIA applies to resident care plans containing personal health information." },
+  { text: "A paramedic service records patient treatment information.", law: "PHIA", incorrectFeedback: "PHIA applies to patient treatment information recorded by health services." },
+  { text: "A nurse practitioner clinic stores medication history.", law: "PHIA", incorrectFeedback: "PHIA applies to medication history held by healthcare providers." },
+  { text: "A hospital sends discharge summaries to a family doctor.", law: "PHIA", incorrectFeedback: "PHIA applies to disclosure of patient discharge information for care." },
+  { text: "A public health unit tracks vaccination records.", law: "PHIA", incorrectFeedback: "PHIA applies to vaccination records because they are personal health information." },
+  { text: "A medical imaging clinic stores X-ray reports.", law: "PHIA", incorrectFeedback: "PHIA applies to medical imaging reports as personal health information." },
+  { text: "A specialist clinic receives a referral containing patient history.", law: "PHIA", incorrectFeedback: "PHIA applies to referrals containing identifiable patient health history." },
+  { text: "A hospice stores patient care preferences.", law: "PHIA", incorrectFeedback: "PHIA applies to care preferences recorded for healthcare services." },
+  { text: "A hospital reviews patient charts for quality improvement.", law: "PHIA", incorrectFeedback: "PHIA applies to hospital use of patient charts for authorized health-system purposes." },
+  { text: "A rehabilitation clinic stores mobility assessment results.", law: "PHIA", incorrectFeedback: "PHIA applies to assessment results created during healthcare services." },
+  { text: "A home-care provider records patient visit notes.", law: "PHIA", incorrectFeedback: "PHIA applies to visit notes containing personal health information." },
+  { text: "A surgeon stores pre-operative assessment information.", law: "PHIA", incorrectFeedback: "PHIA applies to pre-operative assessments because they are health records." },
+  { text: "A dietitian working in a clinic stores patient nutrition plans.", law: "PHIA", incorrectFeedback: "PHIA applies to nutrition plans recorded as part of healthcare." },
+  { text: "A hospital stores emergency department triage records.", law: "PHIA", incorrectFeedback: "PHIA applies to triage records because they contain patient health information." },
+  { text: "A healthcare custodian reports a lost patient file.", law: "PHIA", incorrectFeedback: "PHIA applies to privacy incidents involving personal health information." },
 
-  { text: "A Nova Scotia government office stores citizen data on a US cloud server.", law: "PIIDPA" },
-  { text: "A municipality uses a US-based contractor to process permit applications.", law: "PIIDPA" },
-  { text: "A public body stores employee files on servers located outside Canada.", law: "PIIDPA" },
-  { text: "A provincial department allows foreign technical support to access citizen records.", law: "PIIDPA" },
-  { text: "A school board uses an online platform that stores student data in the United States.", law: "PIIDPA" },
-  { text: "A public college uses a cloud service where student data may be accessed outside Canada.", law: "PIIDPA" },
-  { text: "A government agency sends personal information to a vendor in another country.", law: "PIIDPA" },
-  { text: "A municipality backs up citizen records to servers outside Canada.", law: "PIIDPA" },
-  { text: "A public institution gives a foreign help desk access to personal information.", law: "PIIDPA" },
-  { text: "A provincial department stores public program applications in a non-Canadian data centre.", law: "PIIDPA" },
-  { text: "A public library uses a US-hosted system for patron accounts.", law: "PIIDPA" },
-  { text: "A government office contracts a foreign company to analyze citizen survey data.", law: "PIIDPA" },
-  { text: "A public university stores student advising notes in an international SaaS platform.", law: "PIIDPA" },
-  { text: "A provincial agency permits remote database support from outside Canada.", law: "PIIDPA" },
-  { text: "A municipality uploads resident contact lists to a US email marketing service.", law: "PIIDPA" },
-  { text: "A public school system uses foreign-hosted software for student assessments.", law: "PIIDPA" },
-  { text: "A Nova Scotia public body stores HR files in an overseas cloud system.", law: "PIIDPA" },
-  { text: "A provincial department uses a foreign transcription service for citizen interviews.", law: "PIIDPA" },
-  { text: "A public institution transfers personal data to a vendor outside Canada for processing.", law: "PIIDPA" },
-  { text: "A town office gives non-Canadian support staff access to resident records.", law: "PIIDPA" },
-  { text: "A government body stores grant application data in a US-hosted database.", law: "PIIDPA" },
-  { text: "A public agency uses an international analytics tool on identifiable citizen data.", law: "PIIDPA" },
-  { text: "A public college uses a non-Canadian cloud vendor for student service records.", law: "PIIDPA" },
-  { text: "A school board stores parent contact records in a foreign-hosted platform.", law: "PIIDPA" },
-  { text: "A provincial office sends citizen records to an overseas call centre.", law: "PIIDPA" }
+  { text: "A Nova Scotia government office stores citizen data on a US cloud server.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies when Nova Scotia public-sector personal information is stored or accessed outside Canada." },
+  { text: "A municipality uses a US-based contractor to process permit applications.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to public bodies using foreign service providers for personal information." },
+  { text: "A public body stores employee files on servers located outside Canada.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to public-sector personal information stored outside Canada." },
+  { text: "A provincial department allows foreign technical support to access citizen records.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies when personal information may be accessed from outside Canada." },
+  { text: "A school board uses an online platform that stores student data in the United States.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to student personal information stored by a foreign-hosted service." },
+  { text: "A public college uses a cloud service where student data may be accessed outside Canada.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies when public-sector personal information may be accessed outside Canada." },
+  { text: "A government agency sends personal information to a vendor in another country.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to disclosure or processing of public-sector personal information outside Canada." },
+  { text: "A municipality backs up citizen records to servers outside Canada.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to storage of municipal personal information outside Canada." },
+  { text: "A public institution gives a foreign help desk access to personal information.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies when foreign support staff can access public-sector personal information." },
+  { text: "A provincial department stores public program applications in a non-Canadian data centre.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to public body records stored in data centres outside Canada." },
+  { text: "A public library uses a US-hosted system for patron accounts.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies when a public body stores identifiable information on a US-hosted system." },
+  { text: "A government office contracts a foreign company to analyze citizen survey data.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to foreign processing of identifiable public-sector information." },
+  { text: "A public university stores student advising notes in an international SaaS platform.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to public institution records stored or accessed outside Canada." },
+  { text: "A provincial agency permits remote database support from outside Canada.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies when remote support outside Canada can access personal information." },
+  { text: "A municipality uploads resident contact lists to a US email marketing service.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to municipal personal information placed in a US-based service." },
+  { text: "A public school system uses foreign-hosted software for student assessments.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to foreign-hosted systems containing public-sector student information." },
+  { text: "A Nova Scotia public body stores HR files in an overseas cloud system.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to public body employee information stored outside Canada." },
+  { text: "A provincial department uses a foreign transcription service for citizen interviews.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies when citizen personal information is processed by a foreign service." },
+  { text: "A public institution transfers personal data to a vendor outside Canada for processing.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to public-sector personal data transferred outside Canada for processing." },
+  { text: "A town office gives non-Canadian support staff access to resident records.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies when non-Canadian support staff can access resident information." },
+  { text: "A government body stores grant application data in a US-hosted database.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to public-sector application data stored in a US-hosted database." },
+  { text: "A public agency uses an international analytics tool on identifiable citizen data.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies when identifiable public-sector data is processed by an international tool." },
+  { text: "A public college uses a non-Canadian cloud vendor for student service records.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to public college records stored or accessed through non-Canadian cloud services." },
+  { text: "A school board stores parent contact records in a foreign-hosted platform.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies to parent contact records stored in a foreign-hosted public-sector platform." },
+  { text: "A provincial office sends citizen records to an overseas call centre.", law: "PIIDPA", incorrectFeedback: "PIIDPA applies when public-sector citizen records are sent outside Canada for service delivery." }
 ];
 
 let currentScenario = null;
@@ -342,7 +326,7 @@ function dropItem() {
     feedbackDisplay.textContent = `Incorrect. Correct answer: ${scenarioBeingDropped.law}`;
   }
 
-  showResult(isCorrect);
+  showResult(isCorrect, scenarioBeingDropped.incorrectFeedback);
   updateScore();
 
   fallingItem.style.opacity = "0";
@@ -380,6 +364,7 @@ window.addEventListener("resize", updateItemPosition);
 const resultOverlay = document.getElementById("resultOverlay");
 const resultText = document.getElementById("resultText");
 const resultIcon = document.getElementById("resultIcon");
+const incorrectFeedback = document.getElementById("incorrectFeedback");
 
 const correctSVG = `
 <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
@@ -399,23 +384,31 @@ const incorrectSVG = `
 </svg>
 `;
 
-function showResult(isCorrect) {
+function showResult(isCorrect, feedback) {
   resultOverlay.classList.remove("hidden", "correct", "incorrect");
 
   if (isCorrect) {
     resultOverlay.classList.add("correct");
     resultText.textContent = "CORRECT!";
     resultIcon.innerHTML = correctSVG;
+    incorrectFeedback.textContent = "";
   } else {
     resultOverlay.classList.add("incorrect");
     resultText.textContent = "INCORRECT!";
     resultIcon.innerHTML = incorrectSVG;
-  }
+    incorrectFeedback.textContent = feedback;
 
-  setTimeout(() => {
+      function hideStuff () {
     resultOverlay.classList.add("hidden");
     resultIcon.innerHTML = "";
-  }, 800);
+    incorrectFeedback.textContent = "";
+    console.log("Stuff hidden.")
+  };
+
+  resultOverlay.addEventListener("click", () => hideStuff() );
+  }
+
+
 }
 
 startGame();
