@@ -387,12 +387,19 @@ const incorrectSVG = `
 function showResult(isCorrect, feedback) {
   resultOverlay.classList.remove("hidden", "correct", "incorrect");
 
-  if (isCorrect) {
-    resultOverlay.classList.add("correct");
-    resultText.textContent = "CORRECT!";
-    resultIcon.innerHTML = correctSVG;
+if (isCorrect) {
+  resultOverlay.classList.add("correct");
+  resultText.textContent = "CORRECT!";
+  resultIcon.innerHTML = correctSVG;
+  incorrectFeedback.textContent = "";
+
+  setTimeout(() => {
+    resultOverlay.classList.add("hidden");
+    resultIcon.innerHTML = "";
     incorrectFeedback.textContent = "";
-  } else {
+    console.log("Stuff hidden.");
+  }, 1000);
+} else {
     resultOverlay.classList.add("incorrect");
     resultText.textContent = "INCORRECT!";
     resultIcon.innerHTML = incorrectSVG;
